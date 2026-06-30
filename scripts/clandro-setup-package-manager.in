@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# CLANDRO_APP_PACKAGE_MANAGER should be exported by clandro-app v0.119.0+
+# itself and should contain "apt" or "pacman".
+# CLANDRO_MAIN_PACKAGE_FORMAT should be exported by login script in
+# clandro-tools v0.161+ if clandro-app version is less than 0.119.0 and
+# should contain "debian" or "pacman".
+if [ -z "${CLANDRO_APP_PACKAGE_MANAGER-}" ]; then
+	if [ -n "${CLANDRO_MAIN_PACKAGE_FORMAT-}" ]; then
+		CLANDRO_APP_PACKAGE_MANAGER="$([ "${CLANDRO_MAIN_PACKAGE_FORMAT-}" = "debian" ] && echo "apt" || echo "${CLANDRO_MAIN_PACKAGE_FORMAT-}")"
+	else
+		CLANDRO_APP_PACKAGE_MANAGER="@CLANDRO_PACKAGE_MANAGER@"
+	fi
+fi
+
+case "${CLANDRO_APP_PACKAGE_MANAGER-}" in
+	apt|pacman) :;;
+	*) echo "Unsupported package manager \"${CLANDRO_APP_PACKAGE_MANAGER-}\". Only 'apt' and 'pacman' managers are supported" 1>&2; exit 1;;
+esac
+export CLANDRO_APP_PACKAGE_MANAGER

@@ -1,0 +1,8 @@
+# This file is sourced by pkg
+# Mirror by dmitry. Hosted in Nizhny Novgorod, Russia.
+# Dmitry | https://repository.su/
+# Hosted in Nizhny Novgorod, Russia. Updated four times per day.
+WEIGHT=1
+MAIN="https://repository.su/clandro/clandro-main/"
+ROOT="https://repository.su/clandro/clandro-root/"
+X11="https://repository.su/clandro/clandro-x11/"

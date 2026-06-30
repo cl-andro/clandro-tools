@@ -1,0 +1,4 @@
+if [ ! -f @CLANDRO_HOME@/.config/clandro/clandro.properties ] && [ ! -e @CLANDRO_HOME@/.clandro/clandro.properties ]; then
+	mkdir -p @CLANDRO_HOME@/.clandro
+	cp @CLANDRO_PREFIX@/share/examples/clandro/clandro.properties @CLANDRO_HOME@/.clandro/
+fi

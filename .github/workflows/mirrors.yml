@@ -1,0 +1,94 @@
+name: Mirrors
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'mirrors/**'
+      - 'wiki/mirrors_header.md'
+  pull_request:
+    paths:
+      - 'mirrors/**'
+
+jobs:
+  lint-mirror-files:
+    runs-on: ubuntu-slim
+
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v6
+
+    - name: Check mirror files
+      run: |
+        for file in mirrors/default $(git ls-files mirrors/*/*); do
+          if head -n 4 "$file" | grep -qv '^#'; then
+            echo "Error: $file does not have 4 header lines starting with #" > /dev/stderr
+            exit 1
+          fi
+
+          if ! grep -q '^MAIN=' "$file"; then
+            echo "Error: $file does not contain MAIN" > /dev/stderr
+            exit 1
+          fi
+          if ! grep -q '^ROOT=' "$file"; then
+            echo "Error: $file does not contain ROOT" > /dev/stderr
+            exit 1
+          fi
+          if ! grep -q '^X11=' "$file"; then
+            echo "Error: $file does not contain X11" > /dev/stderr
+            exit 1
+          fi
+
+          if ! grep -q "$(basename $file)" mirrors/Makefile.am; then
+            echo "Error: $file is not listed in mirrors/Makefile.am"
+          fi
+
+          echo "$file passed validation."
+        done
+
+  update-wiki-mirror:
+    runs-on: ubuntu-slim
+    needs: lint-mirror-files
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v6
+
+    - name: Set up SSH key
+      env:
+        GITHUB_SSH_KEY: ${{ secrets.CLANDROBOT2_SSH_KEY }}
+      run: |
+        mkdir -p ~/.ssh
+        echo "$GITHUB_SSH_KEY" > ~/.ssh/id_ed25519_clandrobot2
+        chmod 600 ~/.ssh/id_ed25519_clandrobot2
+        ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+    - name: Clone clandro-packages.wiki
+      run: |
+        if [ ! -d clandro-packages.wiki ]; then
+          GIT_SSH_COMMAND="ssh -i ~/.ssh/id_ed25519_clandrobot2" git clone git@github.com:clandro/clandro-packages.wiki.git
+          cd clandro-packages.wiki
+        else
+          cd clandro-packages.wiki
+          git pull origin master
+        fi
+        git config --global user.name "Clandro Github Actions"
+        git config --global user.email "contact@clandro.dev"
+
+    - name: Generate the Wiki page
+      run: |
+        cd clandro-packages.wiki
+        bash ../mirrors/generate-wiki-page.sh
+
+    - name: Commit and push changes
+      run: |
+        cd clandro-packages.wiki
+        git add Mirrors.md
+        # Check if there are any changes before commiting and pushing
+        if ! git diff --cached --exit-code > /dev/null; then
+          git commit -m "Update Mirrors.md after clandro-tools commit ${GITHUB_SHA::12}" \
+            -m "See https://github.com/clandro/clandro-tools/tree/${GITHUB_SHA}."
+          GIT_SSH_COMMAND="ssh -i ~/.ssh/id_ed25519_clandrobot2" git push origin master
+        fi

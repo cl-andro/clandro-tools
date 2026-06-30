@@ -1,0 +1,8 @@
+# This file is sourced by pkg
+# Mirror by ZUITS. Hosted in China.
+# Information Technology Center in Zhejiang University | https://zuits.zju.edu.cn/
+# 
+WEIGHT=1
+MAIN="https://mirrors.zju.edu.cn/clandro/apt/clandro-main"
+ROOT="https://mirrors.zju.edu.cn/clandro/apt/clandro-root"
+X11="https://mirrors.zju.edu.cn/clandro/apt/clandro-x11"

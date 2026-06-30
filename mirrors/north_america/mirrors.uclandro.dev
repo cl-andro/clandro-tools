@@ -1,0 +1,8 @@
+# This file is sourced by pkg
+# Mirror by Uclandro. Hosted in Los Angeles, California, US.
+# Uclandro | https://github.com/uclandroblog
+# Hosted in Los Angeles, California, USA. Updated daily. 1Gb/s and support IPV4/IPV6. More info at https://github.com/UclandroBlog/Issue.
+WEIGHT=1
+MAIN="https://mirrors.uclandro.dev/clandro/clandro-main"
+ROOT="https://mirrors.uclandro.dev/clandro/clandro-root"
+X11="https://mirrors.uclandro.dev/clandro/clandro-x11"
