@@ -1,0 +1,85 @@
+#!/bin/sh
+# shellcheck shell=dash
+
+is_executable_file() {
+	test -f "$1" -a -x "$1"
+}
+
+set_default_shell() {
+	for file in "@CLANDRO_PREFIX@/bin/bash" "@CLANDRO_PREFIX@/bin/sh" "/system/bin/sh"; do
+		if is_executable_file "$file"; then
+			SHELL="$file"
+			break
+		fi
+	done
+}
+
+if tty >/dev/null 2>&1 && [ $# = 0 ] && [ ! -f ~/.hushlogin ] && [ -z "$CLANDRO_HUSHLOGIN" ]; then
+	# Use user defined dynamic motd file if it exists
+	if [ -f ~/.clandro/motd.sh ]; then
+		[ ! -x ~/.clandro/motd.sh ] && chmod u+x ~/.clandro/motd.sh
+		~/.clandro/motd.sh
+	# Default to clandro-tools package provided static motd file if it exists
+	elif [ -f "@CLANDRO_PREFIX@/etc/motd" ]; then
+		cat "@CLANDRO_PREFIX@/etc/motd"
+	fi
+else
+	# This variable shouldn't be kept set.
+	unset CLANDRO_HUSHLOGIN
+fi
+
+# CLANDRO_VERSION env variable has been exported since v0.107 and PATH was being set to following value in <0.104. Last playstore version was v0.101.
+if tty >/dev/null 2>&1 && [ $# = 0 ] && [ -f "@CLANDRO_PREFIX@/etc/motd-playstore" ] && [ -z "$CLANDRO_VERSION" ] && [ "$PATH" = "@CLANDRO_PREFIX@/bin:@CLANDRO_PREFIX@/bin/applets" ]; then
+	printf '\033[0;31m'; cat "@CLANDRO_PREFIX@/etc/motd-playstore"; printf '\033[0m'
+fi
+
+unset SHELL
+SHELL_FILE=~/.clandro/shell
+
+if [ -L "$SHELL_FILE" ]; then
+	# Set the symlink's value as the shell target.
+	SHELL_TARGET="$(readlink "$SHELL_FILE")"
+	if is_executable_file "$SHELL_TARGET" &&
+		[ ! "$SHELL_TARGET" -ef "@CLANDRO_PREFIX@/bin/login" ]; then
+		SHELL="$SHELL_TARGET"
+	fi
+fi
+
+if [ -z "${SHELL:-}" ]; then
+	set_default_shell
+fi
+
+export SHELL
+
+# CLANDRO_APP_PACKAGE_MANAGER should be exported by clandro-app v0.119.0+ itself
+if [ -z "${CLANDRO_APP_PACKAGE_MANAGER-}" ]; then
+	if { [ -n "$(command -v dpkg)" ] && dpkg --compare-versions "$CLANDRO_VERSION" lt 0.119.0; } ||   # apt
+		{ [ -n "$(command -v vercmp)" ] && [ "$(vercmp "$CLANDRO_VERSION" 0.119.0)" = "-1" ]; }; then # pacman
+		# For the correct operation of scripts that work with the package manager
+		export CLANDRO_MAIN_PACKAGE_FORMAT="@CLANDRO_PACKAGE_FORMAT@"
+	fi
+fi
+
+# Export `libclandro-exec-ld-preload.so` for `clandro-exec`
+# package version `>= 2.0.0`.
+# Some devices may not support setting `$LD_PRELOAD`.
+# - https://github.com/cl-andro/clandro-packages/issues/2066
+# - https://github.com/cl-andro/clandro-packages/commit/1ec6c042
+# - https://github.com/cl-andro/clandro-packages/commit/6fb2bb2f
+if [ -f "@CLANDRO_PREFIX@/lib/libclandro-exec-ld-preload.so" ]; then
+	export LD_PRELOAD="@CLANDRO_PREFIX@/lib/libclandro-exec-ld-preload.so"
+	$SHELL -c "coreutils --coreutils-prog=true" > /dev/null 2>&1 || unset LD_PRELOAD
+elif [ -f "@CLANDRO_PREFIX@/lib/libclandro-exec.so" ]; then
+	export LD_PRELOAD="@CLANDRO_PREFIX@/lib/libclandro-exec.so"
+	$SHELL -c "coreutils --coreutils-prog=true" > /dev/null 2>&1 || unset LD_PRELOAD
+fi
+
+if [ -f "@CLANDRO_PREFIX@/etc/clandro-login.sh" ]; then
+	. "@CLANDRO_PREFIX@/etc/clandro-login.sh"
+fi
+
+if [ -n "$TERM" ]; then
+	exec "$SHELL" -l "$@"
+else
+	exec "$SHELL" "$@"
+fi

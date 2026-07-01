@@ -1,0 +1,8 @@
+# This file is sourced by pkg
+# Mirror by Dan Yael. Hosted in Las Vegas, US.
+# Dan Yael | https://github.com/danyael031
+# Hosted in Las Vegas, US. Synced every 6 hours.
+WEIGHT=1
+MAIN="https://clandro.danyael.xyz/clandro/clandro-main"
+ROOT="https://clandro.danyael.xyz/clandro/clandro-root"
+X11="https://clandro.danyael.xyz/clandro/clandro-x11"

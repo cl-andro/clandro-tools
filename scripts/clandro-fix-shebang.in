@@ -1,0 +1,12 @@
+#!/bin/sh
+
+if [ $# = 0 -o "$1" = "-h" ]; then
+	echo 'usage: clandro-fix-shebang <files>'
+	echo 'Rewrite shebangs in specified files for running under Clandro,'
+	echo 'which is done by rewriting #!*/bin/binary to #!@CLANDRO_PREFIX@/bin/binary.'
+	exit 1
+fi
+
+for file in "$@"; do
+	sed -i -E "1 s@^#\!(.*)/[sx]?bin/(.*)@#\!@CLANDRO_PREFIX@/bin/\2@" "$(realpath "${file}")"
+done

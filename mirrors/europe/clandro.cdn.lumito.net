@@ -1,0 +1,8 @@
+# This file is sourced by pkg
+# Mirror by Lumito. Hosted in Germany.
+# LumitoLuma | https://www.lumito.net/
+# Hosted in Germany, Updated every hour.
+WEIGHT=1
+MAIN="https://clandro.cdn.lumito.net/clandro-main"
+ROOT="https://clandro.cdn.lumito.net/clandro-root"
+X11="https://clandro.cdn.lumito.net/clandro-x11"

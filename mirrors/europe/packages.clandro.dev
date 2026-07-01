@@ -1,0 +1,8 @@
+# This file is sourced by pkg
+# Clandro origin repo. Falkenstein, Germany.
+# Clandro | https://clandro.dev
+# Clandro origin repo.
+WEIGHT=1
+MAIN="https://packages.clandro.dev/apt/clandro-main"
+ROOT="https://packages.clandro.dev/apt/clandro-root"
+X11="https://packages.clandro.dev/apt/clandro-x11"

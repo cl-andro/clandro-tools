@@ -1,0 +1,8 @@
+# This file is sourced by pkg
+# Mirror by Albonycal. Hosted in India.
+# Albonycal | https://github.com/Albonycal
+# This mirror is hosted in India, Updated every 53 minutes.
+WEIGHT=1
+MAIN="https://mirror.nag.albony.in/clandro/clandro-main"
+ROOT="https://mirror.nag.albony.in/clandro/clandro-root"
+X11="https://mirror.nag.albony.in/clandro/clandro-x11"

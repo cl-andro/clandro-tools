@@ -1,0 +1,8 @@
+# This file is sourced by pkg
+# Clandro origin repo. Behind cloudflare cache.
+# Clandro | https://packages.clandro.dev
+# Clandro origin repo behind cloudflare cache.
+WEIGHT=10
+MAIN="https://packages-cf.clandro.dev/apt/clandro-main"
+ROOT="https://packages-cf.clandro.dev/apt/clandro-root"
+X11="https://packages-cf.clandro.dev/apt/clandro-x11"
